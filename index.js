@@ -1,13 +1,19 @@
-const TelegramBot = require('node-telegram-bot-api');
+import TelegramBot from 'node-telegram-bot-api';
 
-// Replace with your bot token
-const token = '7933798213:AAEmTrEReh-Wbs1DaCdM4Er_749ME33LdYc';
+const token = process.env.TOKEN;
+const bot = new TelegramBot(token, { polling: false });
 
-// Create a bot using polling
-const bot = new TelegramBot(token, { polling: true });
+// This endpoint will receive updates from Telegram
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    await bot.processUpdate(req.body);
+    res.status(200).send('OK');
+  } else {
+    res.status(405).send('Method Not Allowed');
+  }
+}
 
-// Handle messages
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, `Hello, ${msg.from.first_name}! You said: "${msg.text}"`);
+  bot.sendMessage(chatId, `Hello from webhook! You said: "${msg.text}"`);
 });
